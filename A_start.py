@@ -2,8 +2,9 @@ import pygame
 import math
 from queue import PriorityQueue
 
-WIDTH = 1000
-WINDOW  = pygame.display.set_mode((WIDTH,WIDTH))
+WIDTH = 800
+HEIGHT = 800
+WINDOW  = pygame.display.set_mode((WIDTH,HEIGHT))
 pygame.display.set_caption("A* star Path Finder")
 
 
@@ -15,7 +16,7 @@ BLACK = (0,0,0)
 ORANGE = (255,140,0)
 CORAL = (240,128,128)
 GREY = (119,136,153)
-PINK = (255,20,147)
+PINK = (128,0,128)
 
 
 class Node:
@@ -39,7 +40,7 @@ class Node:
         return self.color == ORANGE
 
     def is_obstacle(self):
-        return self.color == BLACK
+        return self.color == GREY
 
     def is_start(self):
         return self.color == CORAL
@@ -63,7 +64,7 @@ class Node:
         self.color = PINK
 
     def make_obstacle(self):
-        self.color = BLACK
+        self.color = GREY
     
     def make_path(self):
         self.color =  GREEN
@@ -112,8 +113,68 @@ def draw(win, grid, rows, width):
     draw_box(win, rows, width)
     pygame.display.update()
         
+def get_position(pos, rows,  width):
+    gap = width // rows
+    y, x = pos
+    row = y // gap
+    col = x // gap
+    return row, col
 
+def main(win, width):
+    ROWS = 80
+    box = make_box(ROWS, width)
 
+    start = None
+    end = None
+
+    run = True
+    started = False
+
+    while run:
+        draw(win, box, ROWS, width)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+
+            if started:
+                continue
+
+            # left mouse button do the change
+
+            if pygame.mouse.get_pressed()[0]:
+                pos = pygame.mouse.get_pos()
+                row, col = get_position(pos, ROWS, width)
+                node =  box[row][col]
+                if not start and node != end:
+                    start = node
+                    start.make_start()
+
+                elif not end and node !=start:
+                    end = node
+                    end.make_end()
+
+                elif node != start and node !=end:
+                    node.make_obstacle()
+
+            # right mouse button to undo the change
+            elif pygame.mouse.get_pressed()[2]:
+                pos = pygame.mouse.get_pos()
+                row, col = get_position(pos, ROWS, width)
+                node =  box[row][col]
+                node.reset()
+                if node == start:
+                    start = None
+                elif node == end:
+                    end == None  
+
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE and not started:
+                    pass
+
+    
+    pygame.quit()
+
+main(WINDOW, WIDTH)
 
     
 
