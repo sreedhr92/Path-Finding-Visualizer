@@ -14,7 +14,7 @@ BLUE = (64,224,208)
 GREEN = (50,205,50)
 BLACK = (0,0,0)
 ORANGE = (255,140,0)
-CORAL = (240,128,128)
+CORAL = (0,128,228)
 GREY = (119,136,153)
 PINK = (128,0,128)
 
@@ -72,8 +72,19 @@ class Node:
     def draw(self, win):
         pygame.draw.rect(win, self.color, (self.x, self.y, self.width, self.width))
 
-    def update_neighbors(self, grid):
-        pass
+    def update_neighbors(self, box):
+        self.neighbors=[]
+        if self.row+1 < self.total_rows  and not box[self.row+1][self.col].is_obstacle():
+            self.neighbors.append(box[self.row+1][self.col])
+        
+        if self.row-1 >= 0 and not box[self.row-1][self.col].is_obstacle():
+            self.neighbors.append(box[self.row-1][self.col])
+        
+        if self.col+1 < self.total_rows and not box[self.row][self.col+1].is_obstacle():
+            self.neighbors.append(box[self.row][self.col+1])
+        
+        if self.col-1 >= 0  and not box[self.row][self.col-1].is_obstacle():
+            self.neighbors.append(box[self.row][self.col-1])
 
     def __lt__(self, other):
         return False
@@ -84,6 +95,62 @@ def h(p1,p2):
     x1, y1 = p1
     x2, y2 = p2
     return abs(x1 - x2) + abs(y1 - y2)
+
+def build_path(parent, end , draw):
+    current = end
+    while current in parent:
+        current = parent[current]
+        current.make_path()
+        draw()
+
+
+def astar(draw, box, start, end):
+    count  = 0
+    frontier = PriorityQueue()
+    frontier.put((0, count, start))
+    parent = {}
+    g = {node: float("inf") for row in box for node in row}
+    g[start] = 0
+    f = {node: float("inf") for row in box for node in row}
+    f[start] = h(start.get_position(), end.get_position())
+
+    end_position = end.get_position()
+
+    frontier_hash = {start} # Keep tracks of the Visited Nodes
+    while not frontier.empty():
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+        
+        current = frontier.get()[2]
+        frontier_hash.remove(current)
+
+        if current == end:
+            build_path(parent,end,draw)
+            end.make_end()
+            start.make_start()
+            return True
+        
+        for neighbor in current.neighbors:
+            g_value = g[current]+1
+
+            if g_value < g[neighbor]:
+                parent[neighbor] = current
+                g[neighbor]  = g_value
+                f[neighbor] = g_value + h(neighbor.get_position(),end_position)
+
+                if neighbor not in frontier_hash:
+                    count+=1
+                    frontier.put((f[neighbor], count, neighbor))
+                    frontier_hash.add(neighbor)
+                    neighbor.make_open()
+            
+        draw()
+
+        if current !=start:
+            current.make_closed()
+
+    return False
 
 def make_box(rows, width):
     box = []
@@ -121,23 +188,19 @@ def get_position(pos, rows,  width):
     return row, col
 
 def main(win, width):
-    ROWS = 80
+    ROWS = 50
     box = make_box(ROWS, width)
 
     start = None
     end = None
 
     run = True
-    started = False
 
     while run:
         draw(win, box, ROWS, width)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
-
-            if started:
-                continue
 
             # left mouse button do the change
 
@@ -168,8 +231,17 @@ def main(win, width):
                     end == None  
 
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE and not started:
-                    pass
+                if event.key == pygame.K_SPACE and start and end:
+                    for row in box:
+                        for node in row:
+                            node.update_neighbors(box)
+                
+                    astar(lambda: draw(win, box, ROWS, width), box, start, end)
+                
+                if event.key == pygame.K_c:
+                    start = None
+                    end = None
+                    box = make_box(ROWS, width)
 
     
     pygame.quit()
