@@ -1,11 +1,15 @@
-import pygame
+import pygame, sys
 import math
 from queue import PriorityQueue
+import time
+from pygame.locals import *
 
-WIDTH = 800
+WIDTH = 700
 HEIGHT = 800
+pygame.init()
 WINDOW  = pygame.display.set_mode((WIDTH,HEIGHT))
-pygame.display.set_caption("A* star Path Finder")
+pygame.display.set_caption("Path Finder App")
+font = pygame.font.SysFont(None, 25)
 
 
 # Colors used in the GUI
@@ -18,6 +22,8 @@ CORAL = (0,128,228)
 GREY = (119,136,153)
 PINK = (128,0,128)
 
+TIME = 0
+NODES = 0
 
 class Node:
     def __init__(self, row, col, width, total_rows):
@@ -115,7 +121,8 @@ def astar(draw, box, start, end):
     f[start] = h(start.get_position(), end.get_position())
 
     end_position = end.get_position()
-
+    algo ="Algorithm : A* star"
+    start_time = time.time()
     frontier_hash = {start} # Keep tracks of the Visited Nodes
     while not frontier.empty():
         for event in pygame.event.get():
@@ -144,7 +151,10 @@ def astar(draw, box, start, end):
                     frontier.put((f[neighbor], count, neighbor))
                     frontier_hash.add(neighbor)
                     neighbor.make_open()
-            
+
+        TIME = time.time()-start_time
+        NODES = count
+        draw_stats(NODES,TIME,algo)
         draw()
 
         if current !=start:
@@ -162,11 +172,22 @@ def make_box(rows, width):
             box[i].append(node)
     return box
 
+def draw_text(text, font, color, surface, x, y):
+    textobj = font.render(text, 1, color)
+    textrect = textobj.get_rect()
+    textrect.topleft = (x,y)
+    surface.blit(textobj,textrect)
+
+def draw_stats(count , time, algo):
+    draw_text(algo,font,BLACK,WINDOW,15, 725)
+    draw_text("Time : "+str(time),font,BLACK,WINDOW,200, 725)
+    draw_text("Visited Nodes count :"+ str(count),font,BLACK,WINDOW,450, 725)
+    pygame.display.update()  
 
 # Drawing a border for every node in the box
 def draw_box(win, rows, width):
     gap = width // rows
-    for i in range(rows):
+    for i in range(rows+1):
         pygame.draw.line(win, GREY, (0, i*gap), (width, i*gap))
         for j in range(rows):
             pygame.draw.line(win, GREY, (j*gap, 0 ), (j *gap,width))
@@ -176,7 +197,6 @@ def draw(win, grid, rows, width):
     for row in grid:
         for node in row:
             node.draw(win)
-
     draw_box(win, rows, width)
     pygame.display.update()
         
@@ -195,7 +215,6 @@ def main(win, width):
     end = None
 
     run = True
-
     while run:
         draw(win, box, ROWS, width)
         for event in pygame.event.get():
@@ -207,6 +226,8 @@ def main(win, width):
             if pygame.mouse.get_pressed()[0]:
                 pos = pygame.mouse.get_pos()
                 row, col = get_position(pos, ROWS, width)
+                if row >= len(box) or col >= len(box[0]):
+                    continue
                 node =  box[row][col]
                 if not start and node != end:
                     start = node
@@ -235,7 +256,7 @@ def main(win, width):
                     for row in box:
                         for node in row:
                             node.update_neighbors(box)
-                
+
                     astar(lambda: draw(win, box, ROWS, width), box, start, end)
                 
                 if event.key == pygame.K_c:
@@ -245,6 +266,9 @@ def main(win, width):
 
     
     pygame.quit()
+
+def main_menu():
+    pass
 
 main(WINDOW, WIDTH)
 
