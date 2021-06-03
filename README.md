@@ -2,9 +2,9 @@
 Implementation of various path finding algorithms in Python and path visualization tool to visualize the algorithm as it runs.
 
 
-## Index of the Algorithms .
+## Index of the Algorithms:
 
-* **A* Star **
+* **A\* Star Algorithm**
 
 
 
