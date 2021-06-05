@@ -38,6 +38,6 @@
 
 ## General Working of the Algorithms 👾
 
-    * Evaluating a node involves first checking if it is the target node – if this is the case, a path has been found and the algorithm terminates. Failing this, the node is removed from the open set and marked as visited so that is will not be re-added (this prevents the algorithm from generating loops). Finally, each of the nodes immediate unvisited neighbours are added to the open set. Crucially, for each of these neighbouring nodes, the current node is marked as their predecessor.
+* Evaluating a node involves first checking if it is the target node – if this is the case, a path has been found and the algorithm terminates. Failing this, the node is removed from the open set and marked as visited so that is will not be re-added (this prevents the algorithm from generating loops). Finally, each of the nodes immediate unvisited neighbours are added to the open set. Crucially, for each of these neighbouring nodes, the current node is marked as their predecessor.
 
-    * This search area continues to expand until either it reaches the target node (meaning a path was been found), or there are no new nodes to evaluate (meaning no path was found). If a path is found, it is then reconstructed based on the predecessor of each node, starting from the target node, and continuing until the root node is reached.
+* This search area continues to expand until either it reaches the target node (meaning a path was been found), or there are no new nodes to evaluate (meaning no path was found). If a path is found, it is then reconstructed based on the predecessor of each node, starting from the target node, and continuing until the root node is reached.
