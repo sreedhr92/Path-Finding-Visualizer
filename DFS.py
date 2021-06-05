@@ -1,5 +1,4 @@
 import pygame
-from queue import Queue
 import time
 from pygame.locals import *
 
@@ -107,20 +106,20 @@ def build_path(parent, end , draw):
 
 def dfs(draw, box, start, end):
     count  = 0
-    frontier = Queue()
-    frontier.put(start)
+    frontier = []
+    frontier.append(start)
     parent = {}
 
     
     algo ="Algorithm :DFS "
     start_time = time.time()
     frontier_hash = set() # Keep tracks of the Visited Nodes
-    while not frontier.empty():
+    while len(frontier):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
         
-        current = frontier.get()
+        current = frontier.pop()
         frontier_hash.add(current)
 
         if current == end:
@@ -130,10 +129,10 @@ def dfs(draw, box, start, end):
             return True
         
         for neighbor in current.neighbors:
-
             if neighbor not in frontier_hash:
+                parent[neighbor] = current
                 count+=1
-                frontier.put(neighbor)
+                frontier.append(neighbor)
                 frontier_hash.add(neighbor)
                 neighbor.make_open()
 

@@ -131,8 +131,8 @@ def breadth_first_search(draw, box, start, end):
             return True
         
         for neighbor in current.neighbors:
-
             if neighbor not in frontier_hash:
+                parent[neighbor] = current
                 count+=1
                 frontier.append(neighbor)
                 frontier_hash.add(neighbor)
