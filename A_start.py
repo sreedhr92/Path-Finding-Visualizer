@@ -130,7 +130,7 @@ def astar(draw, box, start, end):
                 pygame.quit()
         
         current = frontier.get()[2]
-        frontier_hash.remove(current)
+        frontier_hash.add(current)
 
         if current == end:
             build_path(parent,end,draw)
