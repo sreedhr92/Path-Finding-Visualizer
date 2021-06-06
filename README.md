@@ -26,8 +26,22 @@
     * Best-first search uses a List, assigning each Node a heuristic value based on its estimated distance from the target node, not taking into account any obstacles. This value is simply the rectilinear distance, or the sum of the horizontal and vertical offsets, between the two points.
 
 * **BFS(Breadth First Search) Algorithm**
-  
+
     * Breadth-first search uses a Queue, which functions much like a real-world queue in ensuring that Nodes are evaluated in the same order they were added.
+
+* **Bi-BFS(Bidirectional Breadth First Search) Algorithm**
+
+    * Bidirectional search is a graph search algorithm which find smallest path form source to goal vertex. It runs two simultaneous search :
+
+        * Forward search form source/initial vertex toward goal vertex
+        * Backward search form goal/target vertex toward source vertex
+
+    * Bidirectional search replaces single search graph(which is likely to grow exponentially) with two smaller sub graphs – one starting from initial vertex and other starting from goal vertex. The search terminates when two graphs intersect.
+
+
+* **DFS(Depth First Search) Algorithm**
+
+    * Depth-first search is an algorithm for traversing or searching tree or graph data structures. The algorithm starts at the root node (selecting some arbitrary node as the root node in the case of a graph) and explores as far as possible along each branch before backtracking. So the basic idea is to start from the root or any arbitrary node and mark the node and move to the adjacent unmarked node and continue this loop until there is no unmarked adjacent node. Then backtrack and check for other unmarked nodes and traverse them. Finally print the nodes in the path
 
 
 ## A* Star Algorithm
