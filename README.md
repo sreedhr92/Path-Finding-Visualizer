@@ -39,7 +39,7 @@
     * Bidirectional search replaces single search graph(which is likely to grow exponentially) with two smaller sub graphs – one starting from initial vertex and other starting from goal vertex. The search terminates when two graphs intersect.
 
 
-* **DFS(Depth First Search) Algorithm**
+* **DFS(Depth First Search) Algorithm(Not the optimal algorithm)**
 
     * Depth-first search is an algorithm for traversing or searching tree or graph data structures. The algorithm starts at the root node (selecting some arbitrary node as the root node in the case of a graph) and explores as far as possible along each branch before backtracking. So the basic idea is to start from the root or any arbitrary node and mark the node and move to the adjacent unmarked node and continue this loop until there is no unmarked adjacent node. Then backtrack and check for other unmarked nodes and traverse them. Finally print the nodes in the path
 
@@ -55,10 +55,15 @@
 
 
 ## Bi-BFS(Bidirectional Breadth First Search) Algorithm
+![2021-06-06-21-58-05](https://user-images.githubusercontent.com/53933590/120932256-ae260c80-c712-11eb-92e7-2a68e1b21a2c.gif)
+
 
 ## BFS(Breadth First Search) Algorithm
+![2021-06-06-22-03-30](https://user-images.githubusercontent.com/53933590/120932409-3c01f780-c713-11eb-8456-460f4cea0952.gif)
+
 
 ## DFS(Depth First Search) Algorithm
+![2021-06-06-22-11-54](https://user-images.githubusercontent.com/53933590/120932692-715b1500-c714-11eb-8209-0138e2094f51.gif)
 
 
 ## Greedy BFS(Best First Search) Algorithm
