@@ -1,6 +1,5 @@
-import pygame, sys
-import math
-from queue import PriorityQueue
+import pygame
+from collections import deque
 import time
 from pygame.locals import *
 
@@ -40,13 +39,13 @@ class Node:
         return self.row, self.col
 
     def is_closed(self):
-        return self.color == BLUE
-        
+        return self.color == (255, 179, 179)
+
     def is_open(self):
-        return self.color == ORANGE
+        return self.color == BLUE
 
     def is_obstacle(self):
-        return self.color == GREY
+        return self.color == BLACK
 
     def is_start(self):
         return self.color == CORAL
@@ -58,20 +57,20 @@ class Node:
         self.color = WHITE
 
     def make_closed(self):
-        self.color = BLUE
-    
+        self.color = (255, 179, 179)
+
     def make_open(self):
-        self.color = ORANGE
-    
+        self.color = BLUE
+
     def make_start(self):
         self.color = CORAL
-    
+
     def make_end(self):
         self.color = PINK
 
     def make_obstacle(self):
-        self.color = GREY
-    
+        self.color = BLACK
+
     def make_path(self):
         self.color =  GREEN
 
@@ -82,83 +81,100 @@ class Node:
         self.neighbors=[]
         if self.row+1 < self.total_rows  and not box[self.row+1][self.col].is_obstacle():
             self.neighbors.append(box[self.row+1][self.col])
-        
+
         if self.row-1 >= 0 and not box[self.row-1][self.col].is_obstacle():
             self.neighbors.append(box[self.row-1][self.col])
-        
+
         if self.col+1 < self.total_rows and not box[self.row][self.col+1].is_obstacle():
             self.neighbors.append(box[self.row][self.col+1])
-        
+
         if self.col-1 >= 0  and not box[self.row][self.col-1].is_obstacle():
             self.neighbors.append(box[self.row][self.col-1])
 
     def __lt__(self, other):
         return False
-    
+
 
 # Calculating the heuristic , we are using manhattan distance for the distance calculation
-def h(p1,p2):
-    x1, y1 = p1
-    x2, y2 = p2
-    return abs(x1 - x2) + abs(y1 - y2)
 
-def build_path(parent, end , draw):
-    current = end
-    while current in parent:
-        current = parent[current]
+def build_path(parent_start,parent_end,intersection, draw):
+    current = intersection
+    current.make_path()
+    while current in parent_start:
+        current = parent_start[current]
+        current.make_path()
+        draw()
+    current = intersection
+    while current in parent_end:
+        current = parent_end[current]
         current.make_path()
         draw()
 
 
-def astar(draw, box, start, end):
+def breadth_first_search(draw, box, start, end):
     count  = 0
-    frontier = PriorityQueue()
-    frontier.put((0, count, start))
-    parent = {}
-    g = {node: float("inf") for row in box for node in row}
-    g[start] = 0
-    f = {node: float("inf") for row in box for node in row}
-    f[start] = h(start.get_position(), end.get_position())
+    frontier_start = deque()
+    frontier_start.append(start)
+    frontier_end = deque()
+    frontier_end.append(end)
+    parent_start = {}
+    parent_end = {}
 
-    end_position = end.get_position()
-    algo ="Algorithm : A* star"
+
+    algo ="Algo :BFS "
     start_time = time.time()
-    frontier_hash = {start} # Keep tracks of the Visited Nodes
-    while not frontier.empty():
+    visited_start = set() # Keep tracks of the Visited Nodes
+    visited_end = set()
+    while len(frontier_start) and len(frontier_end):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
-        
-        current = frontier.get()[2]
-        frontier_hash.add(current)
 
-        if current == end:
-            build_path(parent,end,draw)
+        current = frontier_start.popleft()
+        visited_start.add(current)
+
+        if current in visited_end:
+            build_path(parent_start,parent_end,current,draw)
             end.make_end()
             start.make_start()
             return True
-        
+
         for neighbor in current.neighbors:
-            g_value = g[current]+1
+            if neighbor not in visited_start:
+                parent_start[neighbor] = current
+                count+=1
+                frontier_start.append(neighbor)
+                visited_start.add(neighbor)
+                neighbor.make_open()
 
-            if g_value < g[neighbor]:
-                parent[neighbor] = current
-                g[neighbor]  = g_value
-                f[neighbor] = g_value + h(neighbor.get_position(),end_position)
+        if current !=start and current !=end:
+            current.make_closed()
 
-                if neighbor not in frontier_hash:
-                    count+=1
-                    frontier.put((f[neighbor], count, neighbor))
-                    frontier_hash.add(neighbor)
-                    neighbor.make_open()
+        current = frontier_end.popleft()
+        visited_end.add(current)
+
+        if current in visited_start:
+            build_path(parent_start,parent_end,current,draw)
+            end.make_end()
+            start.make_start()
+            return True
+
+        for neighbor in current.neighbors:
+            if neighbor not in visited_end:
+                parent_end[neighbor] = current
+                count+=1
+                frontier_end.append(neighbor)
+                visited_end.add(neighbor)
+                neighbor.make_open()
+
+        if current !=end and current !=start:
+            current.make_closed()
+
 
         TIME = time.time()-start_time
         NODES = count
         draw_stats(NODES,TIME,algo)
         draw()
-
-        if current !=start:
-            current.make_closed()
 
     return False
 
@@ -182,7 +198,7 @@ def draw_stats(count , time, algo):
     draw_text(algo,font,BLACK,WINDOW,15, 725)
     draw_text("Time : "+str(time),font,BLACK,WINDOW,200, 725)
     draw_text("Visited Nodes count :"+ str(count),font,BLACK,WINDOW,450, 725)
-    pygame.display.update()  
+    pygame.display.update()
 
 # Drawing a border for every node in the box
 def draw_box(win, rows, width):
@@ -199,7 +215,7 @@ def draw(win, grid, rows, width):
             node.draw(win)
     draw_box(win, rows, width)
     pygame.display.update()
-        
+
 def get_position(pos, rows,  width):
     gap = width // rows
     y, x = pos
@@ -249,7 +265,7 @@ def main(win, width):
                 if node == start:
                     start = None
                 elif node == end:
-                    end == None  
+                    end == None
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE and start and end:
@@ -257,21 +273,17 @@ def main(win, width):
                         for node in row:
                             node.update_neighbors(box)
 
-                    astar(lambda: draw(win, box, ROWS, width), box, start, end)
-                
+                    breadth_first_search(lambda: draw(win, box, ROWS, width), box, start, end)
+
                 if event.key == pygame.K_c:
                     start = None
                     end = None
                     box = make_box(ROWS, width)
 
-    
+
     pygame.quit()
 
 def main_menu():
     pass
 
 main(WINDOW, WIDTH)
-
-    
-
-        

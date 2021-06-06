@@ -1,5 +1,6 @@
-import pygame
-from collections import deque
+import pygame, sys
+import math
+from queue import PriorityQueue
 import time
 from pygame.locals import *
 
@@ -96,6 +97,10 @@ class Node:
 
 
 # Calculating the heuristic , we are using manhattan distance for the distance calculation
+def h(p1,p2):
+    x1, y1 = p1
+    x2, y2 = p2
+    return abs(x1 - x2) + abs(y1 - y2)
 
 def build_path(parent, end , draw):
     current = end
@@ -105,23 +110,28 @@ def build_path(parent, end , draw):
         draw()
 
 
-def breadth_first_search(draw, box, start, end):
+def astar(draw, box, start, end):
     count  = 0
-    frontier = deque()
-    frontier.append(start)
+    frontier = PriorityQueue()
+    frontier.put((0, count, start))
     parent = {}
+    g = {node: float("inf") for row in box for node in row}
+    g[start] = 0
+    f = {node: float("inf") for row in box for node in row}
+    f[start] = h(start.get_position(), end.get_position())
 
-
-    algo ="Algo :BFS "
+    end_position = end.get_position()
+    algo ="Algorithm : A* star"
     start_time = time.time()
-    frontier_hash = set() # Keep tracks of the Visited Nodes
-    while len(frontier):
+    visited = {start} # Keep tracks of the Visited Nodes
+    while not frontier.empty():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
 
-        current = frontier.popleft()
-        frontier_hash.add(current)
+        current = frontier.get()[2]
+        visited.add(current)
+
 
         if current == end:
             build_path(parent,end,draw)
@@ -130,12 +140,18 @@ def breadth_first_search(draw, box, start, end):
             return True
 
         for neighbor in current.neighbors:
-            if neighbor not in frontier_hash:
+            g_value = g[current]+1
+
+            if g_value < g[neighbor]:
                 parent[neighbor] = current
-                count+=1
-                frontier.append(neighbor)
-                frontier_hash.add(neighbor)
-                neighbor.make_open()
+                g[neighbor]  = g_value
+                f[neighbor] = g_value + h(neighbor.get_position(),end_position)
+
+                if neighbor not in visited:
+                    count+=1
+                    frontier.put((f[neighbor], count, neighbor))
+                    visited.add(neighbor)
+                    neighbor.make_open()
 
         TIME = time.time()-start_time
         NODES = count
@@ -242,7 +258,7 @@ def main(win, width):
                         for node in row:
                             node.update_neighbors(box)
 
-                    breadth_first_search(lambda: draw(win, box, ROWS, width), box, start, end)
+                    astar(lambda: draw(win, box, ROWS, width), box, start, end)
 
                 if event.key == pygame.K_c:
                     start = None

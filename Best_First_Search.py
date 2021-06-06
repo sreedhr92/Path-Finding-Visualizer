@@ -40,12 +40,12 @@ class Node:
 
     def is_closed(self):
         return self.color == BLUE
-        
+
     def is_open(self):
         return self.color == ORANGE
 
     def is_obstacle(self):
-        return self.color == GREY
+        return self.color == BLACK
 
     def is_start(self):
         return self.color == CORAL
@@ -58,19 +58,19 @@ class Node:
 
     def make_closed(self):
         self.color = BLUE
-    
+
     def make_open(self):
         self.color = ORANGE
-    
+
     def make_start(self):
         self.color = CORAL
-    
+
     def make_end(self):
         self.color = PINK
 
     def make_obstacle(self):
-        self.color = GREY
-    
+        self.color = BLACK
+
     def make_path(self):
         self.color =  GREEN
 
@@ -81,19 +81,19 @@ class Node:
         self.neighbors=[]
         if self.row+1 < self.total_rows  and not box[self.row+1][self.col].is_obstacle():
             self.neighbors.append(box[self.row+1][self.col])
-        
+
         if self.row-1 >= 0 and not box[self.row-1][self.col].is_obstacle():
             self.neighbors.append(box[self.row-1][self.col])
-        
+
         if self.col+1 < self.total_rows and not box[self.row][self.col+1].is_obstacle():
             self.neighbors.append(box[self.row][self.col+1])
-        
+
         if self.col-1 >= 0  and not box[self.row][self.col-1].is_obstacle():
             self.neighbors.append(box[self.row][self.col-1])
 
     def __lt__(self, other):
         return False
-    
+
 
 # Calculating the heuristic , we are using manhattan distance for the distance calculation
 def h(p1,p2):
@@ -122,21 +122,21 @@ def bfs(draw, box, start, end):
     end_position = end.get_position()
     algo ="Algorithm :BFS "
     start_time = time.time()
-    frontier_hash = {start} # Keep tracks of the Visited Nodes
+    visited = {start} # Keep tracks of the Visited Nodes
     while not frontier.empty():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
-        
+
         current = frontier.get()[2]
-        frontier_hash.add(current)
+        visited.add(current)
 
         if current == end:
             build_path(parent,end,draw)
             end.make_end()
             start.make_start()
             return True
-        
+
         for neighbor in current.neighbors:
             g_value = g[current]+1
 
@@ -145,10 +145,10 @@ def bfs(draw, box, start, end):
                 g[neighbor]  = g_value
                 f[neighbor] = h(neighbor.get_position(),end_position)
 
-                if neighbor not in frontier_hash:
+                if neighbor not in visited:
                     count+=1
                     frontier.put((f[neighbor], count, neighbor))
-                    frontier_hash.add(neighbor)
+                    visited.add(neighbor)
                     neighbor.make_open()
 
         TIME = time.time()-start_time
@@ -156,7 +156,7 @@ def bfs(draw, box, start, end):
         draw_stats(NODES,TIME,algo)
         draw()
 
-        if current !=start:
+        if current !=start and current !=end:
             current.make_closed()
 
     return False
@@ -181,7 +181,7 @@ def draw_stats(count , time, algo):
     draw_text(algo,font,BLACK,WINDOW,15, 725)
     draw_text("Time : "+str(time),font,BLACK,WINDOW,200, 725)
     draw_text("Visited Nodes count :"+ str(count),font,BLACK,WINDOW,450, 725)
-    pygame.display.update()  
+    pygame.display.update()
 
 # Drawing a border for every node in the box
 def draw_box(win, rows, width):
@@ -198,7 +198,7 @@ def draw(win, grid, rows, width):
             node.draw(win)
     draw_box(win, rows, width)
     pygame.display.update()
-        
+
 def get_position(pos, rows,  width):
     gap = width // rows
     y, x = pos
@@ -248,7 +248,7 @@ def main(win, width):
                 if node == start:
                     start = None
                 elif node == end:
-                    end == None  
+                    end == None
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE and start and end:
@@ -257,20 +257,16 @@ def main(win, width):
                             node.update_neighbors(box)
 
                     bfs(lambda: draw(win, box, ROWS, width), box, start, end)
-                
+
                 if event.key == pygame.K_c:
                     start = None
                     end = None
                     box = make_box(ROWS, width)
 
-    
+
     pygame.quit()
 
 def main_menu():
     pass
 
 main(WINDOW, WIDTH)
-
-    
-
-        
