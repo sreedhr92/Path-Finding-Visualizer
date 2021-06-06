@@ -43,15 +43,23 @@
 
     * Depth-first search is an algorithm for traversing or searching tree or graph data structures. The algorithm starts at the root node (selecting some arbitrary node as the root node in the case of a graph) and explores as far as possible along each branch before backtracking. So the basic idea is to start from the root or any arbitrary node and mark the node and move to the adjacent unmarked node and continue this loop until there is no unmarked adjacent node. Then backtrack and check for other unmarked nodes and traverse them. Finally print the nodes in the path
 
-
-## A* Star Algorithm
-![2021-06-03-13-46-33](https://user-images.githubusercontent.com/53933590/120613311-bf052280-c473-11eb-9ad5-ebe276b05fac.gif)
-
-## Greedy BFS(Best First Search) Algorithm
-![2021-06-03-14-32-02](https://user-images.githubusercontent.com/53933590/120618387-a814ff00-c478-11eb-8c0f-26aa73285b2b.gif)
-
 ## General Working of the Algorithms 👾
 
 * Evaluating a node involves first checking if it is the target node – if this is the case, a path has been found and the algorithm terminates. Failing this, the node is removed from the open set and marked as visited so that is will not be re-added (this prevents the algorithm from generating loops). Finally, each of the nodes immediate unvisited neighbours are added to the open set. Crucially, for each of these neighbouring nodes, the current node is marked as their predecessor.
 
 * This search area continues to expand until either it reaches the target node (meaning a path was been found), or there are no new nodes to evaluate (meaning no path was found). If a path is found, it is then reconstructed based on the predecessor of each node, starting from the target node, and continuing until the root node is reached.
+
+
+## A* Star Algorithm
+![2021-06-03-13-46-33](https://user-images.githubusercontent.com/53933590/120613311-bf052280-c473-11eb-9ad5-ebe276b05fac.gif)
+
+
+## Bi-BFS(Bidirectional Breadth First Search) Algorithm
+
+## BFS(Breadth First Search) Algorithm
+
+## DFS(Depth First Search) Algorithm
+
+
+## Greedy BFS(Best First Search) Algorithm
+![2021-06-03-14-32-02](https://user-images.githubusercontent.com/53933590/120618387-a814ff00-c478-11eb-8c0f-26aa73285b2b.gif)
